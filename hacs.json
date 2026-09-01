@@ -1,7 +1,7 @@
 {
-  "name": "Jullix Home Assistant Integration",
-  "domain": "jullix",
-  "content_in_root": true,
+  "name": "Jullix",
+  "country": ["BE"],
   "render_readme": true,
-  "zip_release": false
+  "zip_release": false,
+  "homeassistant": "2024.8.0"
 }
