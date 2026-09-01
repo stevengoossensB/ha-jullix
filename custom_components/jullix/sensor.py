@@ -1,20 +1,20 @@
 """Platform for Jullix sensors."""
-import logging
-import json
-import os
-from datetime import timedelta, datetime, timezone
 
-import async_timeout
+import asyncio
+import json
+import logging
+import os
+from datetime import datetime, timedelta, timezone
+
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, CoordinatorEntity
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
-from .const import DOMAIN, DEFAULT_SCAN_INTERVAL
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
-# map each category to an mdi: icon
 ICONS: dict[str, str] = {
     "meter": "mdi:flash",
     "solar": "mdi:solar-power",
@@ -24,39 +24,38 @@ ICONS: dict[str, str] = {
 }
 
 _LOGGER = logging.getLogger(__name__)
-# Load sensor_config from the same folder as this file
 _CONFIG_PATH = os.path.join(os.path.dirname(__file__), "sensor_config.json")
+
 try:
-    with open(_CONFIG_PATH) as f:
-        SENSOR_CONFIG = json.load(f)
+    with open(_CONFIG_PATH, encoding="utf-8") as file:
+        SENSOR_CONFIG = json.load(file)
 except FileNotFoundError:
     _LOGGER.error("sensor_config.json not found at %s", _CONFIG_PATH)
     SENSOR_CONFIG = {}
 
-def _flatten(obj, parent_key: str = "", out: dict = None) -> dict:
+
+def _flatten(obj, parent_key: str = "", out: dict | None = None) -> dict:
     out = {} if out is None else out
     if isinstance(obj, dict):
-        for k, v in obj.items():
-            new_key = f"{parent_key}_{k}" if parent_key else k
-            _flatten(v, new_key, out)
+        for key, value in obj.items():
+            new_key = f"{parent_key}_{key}" if parent_key else key
+            _flatten(value, new_key, out)
     else:
         out[parent_key] = obj
     return out
 
-async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities,
-):
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Set up Jullix sensors from a config entry."""
     session = async_get_clientsession(hass)
     host = hass.data[DOMAIN][entry.entry_id]["host"]
 
     async def fetch_json(endpoint: str):
         try:
-            async with async_timeout.timeout(10):
-                resp = await session.get(f"{host}{endpoint}")
-                return await resp.json()
+            async with asyncio.timeout(10):
+                response = await session.get(f"{host}{endpoint}")
+                response.raise_for_status()
+                return await response.json()
         except Exception as err:
             _LOGGER.error("Error fetching %s: %s", endpoint, err)
             return None
@@ -85,13 +84,13 @@ async def async_setup_entry(
             device_id = sample.get("id") or sample.get("meter") or category
             name_base = sample.get("device", f"Jullix {category.title()}")
             flat = _flatten(sample)
-            for key, val in flat.items():
-#                if isinstance(val, (int, float)):
-                  entities.append(
-                      JullixSensor(coordinator, category, key, device_id, name_base)
-                  )
+            for key in flat:
+                entities.append(
+                    JullixSensor(coordinator, category, key, device_id, name_base)
+                )
 
     async_add_entities(entities)
+
 
 class JullixSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, category, key, device_id, name_base):
@@ -101,16 +100,17 @@ class JullixSensor(CoordinatorEntity, SensorEntity):
         self._key = key
         self._device_id = device_id
         self._name_base = name_base
-        self._attr_name = f"{name_base} {key.replace('_',' ').title()}"
+        self._attr_name = f"{name_base} {key.replace('_', ' ').title()}"
         self._attr_unique_id = f"jullix_{category}_{device_id}_{key}"
-        try:
-            self._attr_native_unit_of_measurement = SENSOR_CONFIG[category][key]["unit_of_measurement"]
-        except KeyError:
-            self._attr_native_unit_of_measurement = None  # set via config if needed
+
+        config = SENSOR_CONFIG.get(category, {}).get(key, {})
+        self._attr_native_unit_of_measurement = config.get("unit_of_measurement")
+        self._attr_device_class = config.get("device_class")
+        self._attr_state_class = config.get("state_class")
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Group sensors by physical device (meter, battery, etc)."""
+        """Group sensors by physical device."""
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self._category}_{self._device_id}")},
             name=self._name_base,
@@ -124,33 +124,40 @@ class JullixSensor(CoordinatorEntity, SensorEntity):
         if not data:
             return None
         if isinstance(data, list):
-            # find the sample matching this sensor's device_id
             sample = next(
                 (
-                    d
-                    for d in data
-                    if (d.get("id") or d.get("meter") or self._category)
+                    candidate
+                    for candidate in data
+                    if (candidate.get("id") or candidate.get("meter") or self._category)
                     == self._device_id
                 ),
-                data[0],  # fallback to first sample if id not found
+                data[0],
             )
         else:
             sample = data
+
         flat = _flatten(sample)
-        val = flat.get(self._key)
-        # Convert Jullix meter timestamps (e.g. 250518214500) to ISO8601
-        if self._category == "meter" and self._key in ("time", "captar_month_max_time") and val:
+        value = flat.get(self._key)
+
+        if (
+            self._category == "meter"
+            and self._key in ("time", "captar_month_max_time")
+            and value
+        ):
             try:
-                dt = datetime.strptime(str(val), "%y%m%d%H%M%S")
+                dt = datetime.strptime(str(value), "%y%m%d%H%M%S")
                 return dt.replace(tzinfo=timezone.utc).isoformat()
             except ValueError:
-                _LOGGER.error("Unable to parse timestamp %s for sensor %s", val, self._key)
-        if isinstance(val, (int, float)):
-            return round(val, 2)
-        return val
+                _LOGGER.error(
+                    "Unable to parse timestamp %s for sensor %s", value, self._key
+                )
+
+        if isinstance(value, (int, float)):
+            return round(value, 2)
+
+        return value
 
     @property
     def icon(self) -> str | None:
         """Return mdi: icon based on category."""
         return ICONS.get(self._category)
-
