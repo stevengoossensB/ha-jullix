@@ -3,7 +3,7 @@
 [![Maintainer](https://img.shields.io/badge/maintainer-stevengoossensB-green?style=for-the-badge&logo=github)](https://github.com/stevengoossensB)
 [![MIT License](https://img.shields.io/github/license/stevengoossensB/jullix?style=flat-square)](https://github.com/stevengoossensB/jullix/blob/main/LICENSE)
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=flat-square)](https://github.com/hacs/integration)
-[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=stevengoossensB&repository=jullix&category=integration)
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=stevengoossensB&repository=jullix&category=Integration)
 [![Validation Status](https://github.com/stevengoossensB/jullix/actions/workflows/validate.yml/badge.svg)](https://github.com/stevengoossensB/jullix/actions/workflows/validate.yml)
 
 [Jullix](https://jullix.com) is an energy management platform that exposes local REST endpoints for meter, solar, battery, charger and plug telemetry.
