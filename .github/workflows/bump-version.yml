@@ -76,7 +76,8 @@ jobs:
           subprocess.run(["git", "add", "custom_components/jullix/manifest.json"], check=True)
           subprocess.run(["git", "commit", "-m", f"chore: bump version to {new_version}"], check=True)
           subprocess.run(["git", "tag", new_version], check=True)
-          subprocess.run(["git", "push", "origin", "HEAD:${{ github.event.repository.default_branch }}", new_version], check=True)
+          subprocess.run(["git", "push", "origin", f"HEAD:${{ github.event.repository.default_branch }}"], check=True)
+          subprocess.run(["git", "push", "origin", new_version], check=True)
           
           with open(os.environ["GITHUB_OUTPUT"], "a") as github_output:
               github_output.write(f"new_version={new_version}\n")
