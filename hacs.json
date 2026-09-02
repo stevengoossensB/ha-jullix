@@ -3,6 +3,5 @@
   "country": ["BE"],
   "render_readme": true,
   "zip_release": false,
-  "homeassistant": "2024.8.0",
-  "topics": ["homeassistant", "home-assistant", "hacs", "integration"]
+  "homeassistant": "2024.8.0"
 }

@@ -1,14 +1,14 @@
 {
   "domain": "jullix",
   "name": "Jullix",
-  "version": "0.2.0",
-  "documentation": "https://github.com/stevengoossensB/jullix",
-  "issue_tracker": "https://github.com/stevengoossensB/jullix/issues",
-  "requirements": [],
-  "dependencies": [],
   "codeowners": ["@stevengoossensB"],
-  "loggers": ["custom_components.jullix"],
   "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/stevengoossensB/jullix",
+  "integration_type": "hub",
   "iot_class": "local_polling",
-  "integration_type": "hub"
+  "issue_tracker": "https://github.com/stevengoossensB/jullix/issues",
+  "loggers": ["custom_components.jullix"],
+  "requirements": [],
+  "version": "0.2.0"
 }

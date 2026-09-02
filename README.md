@@ -74,6 +74,8 @@ If no entities appear:
 - Integration code lives in `custom_components/jullix`
 - Metadata for Home Assistant is in `custom_components/jullix/manifest.json`
 - HACS metadata is in `hacs.json`
+- HACS brand assets are stored in `custom_components/jullix/brand/icon.png`
+- GitHub repository description and repository topics must be set in GitHub repository settings for HACS repository validation
 
 ## License
 
