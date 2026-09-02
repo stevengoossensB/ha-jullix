@@ -1,0 +1,11 @@
+[
+    {
+        "id": "xxxxxxxxxx",
+        "localid": "A01",
+        "device": "Sofar HYD 5000-EP",
+        "power": 0.00999999977648258,
+        "energy": 954.5,
+        "fault": 0,
+        "direct_timeout": false
+    }
+]

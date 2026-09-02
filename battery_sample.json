@@ -1,0 +1,16 @@
+[
+    {
+        "id": "xxxxxxxxxx",
+        "localid": "A01",
+        "device": "Sofar HYD 5000-EP",
+        "power": 0,
+        "energy_charged": 506.20001220703125,
+        "energy_discharged": 504.80001831054688,
+        "direct_timeout": false,
+        "battery": {
+            "voltage": 50.600002288818359,
+            "soc": 10,
+            "fault": 0
+        }
+    }
+]

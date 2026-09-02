@@ -1,0 +1,111 @@
+{
+  "meter": {
+    "captar_month_max_value": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "captar_actual": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "captar_month_max_time": {
+      "device_class": "timestamp"
+    },
+    "energy_in_1": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "energy_in_2": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "energy_out_1": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "energy_out_2": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "power_in": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "power_out": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "gas": {
+      "unit_of_measurement": "m³",
+      "device_class": "gas",
+      "state_class": "total_increasing"
+    },
+    "voltage_l1": {
+      "unit_of_measurement": "V",
+      "device_class": "voltage",
+      "state_class": "measurement"
+    },
+    "voltage_l2": {
+      "unit_of_measurement": "V",
+      "device_class": "voltage",
+      "state_class": "measurement"
+    },
+    "voltage_l3": {
+      "unit_of_measurement": "V",
+      "device_class": "voltage",
+      "state_class": "measurement"
+    },
+    "water": {
+      "unit_of_measurement": "m³",
+      "device_class": "volume",
+      "state_class": "total_increasing"
+    }
+  },
+  "solar": {
+    "power": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "energy": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    }
+  },
+  "battery": {
+    "power": {
+      "unit_of_measurement": "kW",
+      "device_class": "power",
+      "state_class": "measurement"
+    },
+    "energy_charged": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "energy_discharged": {
+      "unit_of_measurement": "kWh",
+      "device_class": "energy",
+      "state_class": "total_increasing"
+    },
+    "battery_voltage": {
+      "unit_of_measurement": "V",
+      "device_class": "voltage",
+      "state_class": "measurement"
+    },
+    "battery_soc": {
+      "unit_of_measurement": "%",
+      "device_class": "battery",
+      "state_class": "measurement"
+    }
+  }
+}
