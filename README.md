@@ -1,10 +1,22 @@
 # Jullix for Home Assistant
 
 [![Maintainer](https://img.shields.io/badge/maintainer-stevengoossensB-green?style=for-the-badge&logo=github)](https://github.com/stevengoossensB)
+
 [![MIT License](https://img.shields.io/github/license/stevengoossensB/jullix?style=flat-square)](https://github.com/stevengoossensB/jullix/blob/main/LICENSE)
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=flat-square)](https://github.com/hacs/integration)
-[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=stevengoossensB&repository=jullix&category=Integration)
+
+[![GitHub Issues](https://img.shields.io/github/issues/stevengoossensB/ha-jullix)](https://github.com/stevengoossensB/ha-jullix/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/stevengoossensB/ha-jullix/pulls)
+
+
 [![Validation Status](https://github.com/stevengoossensB/jullix/actions/workflows/validate.yml/badge.svg)](https://github.com/stevengoossensB/jullix/actions/workflows/validate.yml)
+[![Python](https://img.shields.io/badge/Python-FFD43B?logo=python)](https://github.com/stevengoossensB/ha-idm/search?l=python)
+[![Latest Release](https://img.shields.io/github/v/release/stevengoossensB/ha-jullix?logo=github)](https://github.com/stevengoossensB/ha-jullix/releases)
+[![Last Commit](https://img.shields.io/github/last-commit/stevengoossensB/ha-jullix)](https://github.com/stevengoossensB/ha-jullix/commits)
+
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&slug=stevengoossens&button_colour=FFDD00&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=ffffff)](https://coff.ee/stevengoossens)
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=stevengoossensB&repository=jullix&category=Integration)
 
 [Jullix](https://jullix.com) is an energy management platform that exposes local REST endpoints for meter, solar, battery, charger and plug telemetry.
 
