@@ -4,10 +4,10 @@
   "codeowners": ["@stevengoossensB"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/stevengoossensB/jullix",
+  "documentation": "https://github.com/stevengoossensB/ha-jullix",
   "integration_type": "hub",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/stevengoossensB/jullix/issues",
+  "issue_tracker": "https://github.com/stevengoossensB/ha-jullix/issues",
   "loggers": ["custom_components.jullix"],
   "requirements": [],
   "version": "0.2.0"
