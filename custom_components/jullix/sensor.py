@@ -34,6 +34,24 @@ except FileNotFoundError:
     SENSOR_CONFIG = {}
 
 
+def _sample_device_id(category: str, sample: dict) -> str:
+    """Return a stable, unique device identifier for a data sample.
+
+    Solar payloads can contain multiple inverters with the same ``id`` but
+    different ``localid`` values (e.g. ``A01``, ``T01``).  For solar entries
+    both fields are combined so every inverter gets its own identity.  For all
+    other categories the existing ``id`` / ``meter`` / category fallback is
+    preserved.
+    """
+    if category == "solar":
+        sid = sample.get("id")
+        lid = sample.get("localid")
+        if sid and lid:
+            return f"{sid}_{lid}"
+        return lid or sid or category
+    return sample.get("id") or sample.get("meter") or category
+
+
 def _flatten(obj, parent_key: str = "", out: dict | None = None) -> dict:
     out = {} if out is None else out
     if isinstance(obj, dict):
@@ -81,7 +99,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             continue
         samples = payload if isinstance(payload, list) else [payload]
         for sample in samples:
-            device_id = sample.get("id") or sample.get("meter") or category
+            device_id = _sample_device_id(category, sample)
             name_base = sample.get("device", f"Jullix {category.title()}")
             flat = _flatten(sample)
             for key in flat:
@@ -128,8 +146,7 @@ class JullixSensor(CoordinatorEntity, SensorEntity):
                 (
                     candidate
                     for candidate in data
-                    if (candidate.get("id") or candidate.get("meter") or self._category)
-                    == self._device_id
+                    if _sample_device_id(self._category, candidate) == self._device_id
                 ),
                 data[0],
             )
