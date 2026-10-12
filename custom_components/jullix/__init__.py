@@ -1,7 +1,16 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DEFAULT_HOST, DOMAIN, PLATFORMS
+from .api import JullixApiClient
+from .const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    DEFAULT_HOST,
+    DOMAIN,
+    PLATFORMS,
+)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -9,12 +18,28 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    host = entry.data.get(CONF_HOST, DEFAULT_HOST).rstrip("/")
+    client = JullixApiClient(
+        async_get_clientsession(hass),
+        host,
+        username=entry.data.get(CONF_USERNAME),
+        password=entry.data.get(CONF_PASSWORD),
+    )
+
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
-        "host": entry.data.get("host", DEFAULT_HOST).rstrip("/"),
+        "host": host,
+        "client": client,
     }
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the entry when its options change."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Jullix gateway",
+        "description": "Connect to your Jullix gateway's local API.",
+        "data": {
+          "host": "Host (e.g. jullix.local)",
+          "username": "Username (optional)",
+          "password": "Password (optional)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Jullix options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  }
+}

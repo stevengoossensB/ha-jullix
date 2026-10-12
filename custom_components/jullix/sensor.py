@@ -1,6 +1,5 @@
 """Platform for Jullix sensors."""
 
-import asyncio
 import json
 import logging
 import os
@@ -9,11 +8,10 @@ from datetime import datetime, timedelta, timezone
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN, SENSOR_ENDPOINTS
 
 ICONS: dict[str, str] = {
     "meter": "mdi:flash",
@@ -21,6 +19,12 @@ ICONS: dict[str, str] = {
     "battery": "mdi:battery",
     "charger": "mdi:ev-station",
     "plug": "mdi:power-plug",
+    "dsmr": "mdi:gauge",
+    "inverter": "mdi:current-ac",
+    "ethernet": "mdi:ethernet",
+    "wifi": "mdi:wifi",
+    "system": "mdi:chip",
+    "firmware": "mdi:package-up",
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,31 +69,23 @@ def _flatten(obj, parent_key: str = "", out: dict | None = None) -> dict:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Set up Jullix sensors from a config entry."""
-    session = async_get_clientsession(hass)
-    host = hass.data[DOMAIN][entry.entry_id]["host"]
+    data = hass.data[DOMAIN][entry.entry_id]
+    client = data["client"]
 
-    async def fetch_json(endpoint: str):
-        try:
-            async with asyncio.timeout(10):
-                response = await session.get(f"{host}{endpoint}")
-                response.raise_for_status()
-                return await response.json()
-        except Exception as err:
-            _LOGGER.error("Error fetching %s: %s", endpoint, err)
-            return None
+    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
     async def _update():
-        return {
-            key: await fetch_json(f"/api/ems/{key}")
-            for key in ["meter", "solar", "battery", "charger", "plug"]
-        }
+        result = {}
+        for category, endpoint in SENSOR_ENDPOINTS.items():
+            result[category] = await client.get(endpoint)
+        return result
 
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
         name="jullix",
         update_method=_update,
-        update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
+        update_interval=timedelta(seconds=scan_interval),
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -99,6 +95,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             continue
         samples = payload if isinstance(payload, list) else [payload]
         for sample in samples:
+            if not isinstance(sample, dict):
+                continue
             device_id = _sample_device_id(category, sample)
             name_base = sample.get("device", f"Jullix {category.title()}")
             flat = _flatten(sample)
@@ -146,12 +144,16 @@ class JullixSensor(CoordinatorEntity, SensorEntity):
                 (
                     candidate
                     for candidate in data
-                    if _sample_device_id(self._category, candidate) == self._device_id
+                    if isinstance(candidate, dict)
+                    and _sample_device_id(self._category, candidate) == self._device_id
                 ),
                 data[0],
             )
         else:
             sample = data
+
+        if not isinstance(sample, dict):
+            return None
 
         flat = _flatten(sample)
         value = flat.get(self._key)
