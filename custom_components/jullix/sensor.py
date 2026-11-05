@@ -108,6 +108,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     async_add_entities(entities)
 
 
+def _parse_meter_timestamp(value: object) -> str | None:
+    """Convert Jullix's compact timestamp, ignoring unavailable sentinels."""
+    text = str(value).strip()
+    if not text.isdigit() or len(text) != 12:
+        return None
+    try:
+        dt = datetime.strptime(text, "%y%m%d%H%M%S")
+    except ValueError:
+        return None
+    return dt.replace(tzinfo=timezone.utc).isoformat()
+
+
 class JullixSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, category, key, device_id, name_base):
         super().__init__(coordinator)
@@ -163,13 +175,15 @@ class JullixSensor(CoordinatorEntity, SensorEntity):
             and self._key in ("time", "captar_month_max_time")
             and value
         ):
-            try:
-                dt = datetime.strptime(str(value), "%y%m%d%H%M%S")
-                return dt.replace(tzinfo=timezone.utc).isoformat()
-            except ValueError:
-                _LOGGER.error(
-                    "Unable to parse timestamp %s for sensor %s", value, self._key
-                )
+            parsed = _parse_meter_timestamp(value)
+            if parsed is not None:
+                return parsed
+            _LOGGER.debug(
+                "Ignoring unavailable or invalid timestamp %s for sensor %s",
+                value,
+                self._key,
+            )
+            return None
 
         if isinstance(value, (int, float)):
             return round(value, 2)
